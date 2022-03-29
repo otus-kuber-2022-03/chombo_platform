@@ -34,15 +34,24 @@ spec:
  - установлен kubectl
  - развёрнут кластер Minikube, проведена проверка устойчивости работы 
 кастара поднятого по умолчанию *(docker rm -f $(docker ps -a -q))*
- - изучены инструкции kubectl
+ - изучены инструкции kubectl 
+
+``` 
+kubectl apply -f <file>
+kubectl get pod <name> -o yaml
+kubectl describe pod <name>
+kubectl delete pod <name>
+kubectl get pods -w
+kubectl port-forward --address 0.0.0.0 pod/<name> port:port
+```
  - найден ответ на вопрос о причинах восстановления pod в kube-system namespace
  - ...
 
 ## Как запустить проект:
- - 
+ - ...
 
 ## Как проверить работоспособность:
- - 
+ - ...
 
 ## PR checklist:
  - [ ] Выставлен label с темой домашнего задания

@@ -15,7 +15,8 @@ RUN set -x; \
     touch /var/run/nginx.pid; \
     chown -R nginx:nginx /var/run/nginx.pid; \
     rm /etc/nginx/conf.d/default.conf; \
-    mkdir /app ; \
+    mkdir /app; \
+    chown -R nginx:nginx /app; \
     { \
     echo 'server {'; \
     echo '    listen 8000;'; \
