@@ -26,6 +26,19 @@ spec:
 ```
 
  - [ ] Задание со *
+   - Выясните причину, по которой pod frontend находится в статусе Error
+ ```
+{"message":"Tracing enabled.","severity":"info","timestamp":"2022-03-29T21:31:48.429464968Z"}
+{"message":"Profiling enabled.","severity":"info","timestamp":"2022-03-29T21:31:48.429514385Z"}
+panic: environment variable "PRODUCT_CATALOG_SERVICE_ADDR" not set
+```
+   - Создайте новый манифест  . При его
+   применении ошибка должна исчезнуть. Подсказки можно найти:
+   В логах - kubectl logs frontend
+   В манифесте по
+   В результате, после применения исправленного манифеста pod
+   frontend должен находиться в статусе Running (опустим вопрос,
+   действительно ли микросервис работает)
 
 ## В процессе сделано:
  - описан Dockerfile для запуска nginx пользователя с UID 1001, 
@@ -43,9 +56,11 @@ kubectl describe pod <name>
 kubectl delete pod <name>
 kubectl get pods -w
 kubectl port-forward --address 0.0.0.0 pod/<name> port:port
+...
+использования ad-hoc режима
 ```
  - найден ответ на вопрос о причинах восстановления pod в kube-system namespace
- - ...
+ - созданы манифесты *web-pod.yaml, frontend-pod-healthy.yaml*
 
 ## Как запустить проект:
  - ...
@@ -54,4 +69,4 @@ kubectl port-forward --address 0.0.0.0 pod/<name> port:port
  - ...
 
 ## PR checklist:
- - [ ] Выставлен label с темой домашнего задания
+ - [ kubernetes-intro ] Выставлен label с темой домашнего задания
