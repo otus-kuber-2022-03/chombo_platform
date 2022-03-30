@@ -20,37 +20,12 @@ RUN set -x; \
     { \
     echo 'server {'; \
     echo '    listen 8000;'; \
+    echo '    server_name _;'; \
     echo '    root /app;'; \
     echo '    index index.html index.htm;'; \
-    echo; \
-    echo '    location /healthcheck {'; \
-    echo '        return 200;'; \
-    echo '        access_log off;'; \
-    echo '        #allow 127.0.0.1/32;'; \
-    echo '        #deny all;'; \
-    echo '    }'; \
-    echo; \
-    echo '    location /status {'; \
-    echo '        stub_status on;'; \
-    echo '        access_log off;'; \
-    echo '        #allow 127.0.0.1/32;'; \
-    echo '        #deny all;'; \
-    echo '    }'; \
-    echo; \
     echo '    location / {'; \
     echo '        try_files $uri $uri/ =404;'; \
     echo '    }'; \
-    echo; \
-    echo '    #location ~ /\. {'; \
-    echo '    #    deny all;'; \
-    echo '    #    access_log off;'; \
-    echo '    #    log_not_found off;'; \
-    echo '    #}'; \
-    echo; \
-    echo '    #error_page   500 502 503 504  /50x.html;'; \
-    echo '    #location = /50x.html {'; \
-    echo '    #    root   /usr/share/nginx/html;'; \
-    echo '    #}'; \
     echo '}'; \
 	  } | tee /etc/nginx/conf.d/01-host.conf
 
