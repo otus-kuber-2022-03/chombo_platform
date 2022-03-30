@@ -1,2 +1,72 @@
-# chombo_platform
-chombo Platform repository
+# Выполнено ДЗ № 1
+
+ - [ ] Основное ДЗ
+ - Разберитесь почему все pod в namespace kube-system восстановились
+после удаления. Укажите причину в описании PR
+
+``` sh 
+~ % kubectl get pods -n kube-system
+coredns-64897985d-5j8jn            1/1     Running   0          40m
+etcd-minikube                      1/1     Running   3          40m
+kube-apiserver-minikube            1/1     Running   3          40m
+kube-controller-manager-minikube   1/1     Running   3          40m
+kube-proxy-thcpm                   1/1     Running   0          40m
+kube-scheduler-minikube            1/1     Running   3          40m
+```
+[static Pods](https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/): 
+*kube-apiserver-minikube, kube-controller-manager-minikube, 
+kube-controller-manager-minikube, kube-proxy-thcpm, kube-scheduler-minikube*
+restarted by **kubelet**
+
+[ReplicationController](https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller)
+*coredns-64897985d-5j8jn*
+```
+spec:
+  replicas: 1
+```
+
+ - [ ] Задание со *
+   - Выясните причину, по которой pod frontend находится в статусе Error
+ ```
+{"message":"Tracing enabled.","severity":"info","timestamp":"2022-03-29T21:31:48.429464968Z"}
+{"message":"Profiling enabled.","severity":"info","timestamp":"2022-03-29T21:31:48.429514385Z"}
+panic: environment variable "PRODUCT_CATALOG_SERVICE_ADDR" not set
+```
+   - Создайте новый манифест  . При его
+   применении ошибка должна исчезнуть. Подсказки можно найти:
+   В логах - kubectl logs frontend
+   В манифесте по
+   В результате, после применения исправленного манифеста pod
+   frontend должен находиться в статусе Running (опустим вопрос,
+   действительно ли микросервис работает)
+
+## В процессе сделано:
+ - описан Dockerfile для запуска nginx пользователя с UID 1001, 
+ и выполнено минимальное конфгурирование nginx (listen port 8000, host root /app)
+ - образ залит в личный регистри dochombo/otus:web.v1
+ - установлен kubectl
+ - развёрнут кластер Minikube, проведена проверка устойчивости работы 
+кастара поднятого по умолчанию *(docker rm -f $(docker ps -a -q))*
+ - изучены инструкции kubectl 
+
+``` 
+kubectl apply -f <file>
+kubectl get pod <name> -o yaml
+kubectl describe pod <name>
+kubectl delete pod <name>
+kubectl get pods -w
+kubectl port-forward --address 0.0.0.0 pod/<name> port:port
+...
+использования ad-hoc режима
+```
+ - найден ответ на вопрос о причинах восстановления pod в kube-system namespace
+ - созданы манифесты *web-pod.yaml, frontend-pod-healthy.yaml*
+
+## Как запустить проект:
+ - ...
+
+## Как проверить работоспособность:
+ - ...
+
+## PR checklist:
+ - [ kubernetes-intro ] Выставлен label с темой домашнего задания
