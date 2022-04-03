@@ -1,72 +1,53 @@
-# Выполнено ДЗ № 1
+# Выполнено ДЗ № 2
 
  - [ ] Основное ДЗ
- - Разберитесь почему все pod в namespace kube-system восстановились
-после удаления. Укажите причину в описании PR
+ - Удалите все запущенные pod и после их пересоздания еще раз
+   проверьте, из какого образа они развернулись
+   Руководствуясь материалами лекции опишите произошедшую
+   ситуацию, почему обновление ReplicaSet не повлекло обновление
+   запущенных pod?
+```   
+chombo@% kubectl delete pods -l app=frontend
+pod "frontend-dpnkg" deleted
+pod "frontend-nhlgm" deleted
+pod "frontend-sk8rf" deleted
+chombo@% kubectl get pods -l app=frontend -o=jsonpath='{.items[0:3].spec.containers[0].image}'
+dochombo/otus:frontend.v2 dochombo/otus:frontend.v2 dochombo/otus:frontend.v2%
+```
+контроллер ReplicaSet следит за количеством запущенных подов,
+но не за их «качеством». Для применения необходимо создать 
+ReplicaSet с новой конфигураций, затем уменьшаем replicas в 
+старом и увеличивить replicas в новом.
 
-``` sh 
-~ % kubectl get pods -n kube-system
-coredns-64897985d-5j8jn            1/1     Running   0          40m
-etcd-minikube                      1/1     Running   3          40m
-kube-apiserver-minikube            1/1     Running   3          40m
-kube-controller-manager-minikube   1/1     Running   3          40m
-kube-proxy-thcpm                   1/1     Running   0          40m
-kube-scheduler-minikube            1/1     Running   3          40m
-```
-[static Pods](https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/): 
-*kube-apiserver-minikube, kube-controller-manager-minikube, 
-kube-controller-manager-minikube, kube-proxy-thcpm, kube-scheduler-minikube*
-restarted by **kubelet**
-
-[ReplicationController](https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller)
-*coredns-64897985d-5j8jn*
-```
-spec:
-  replicas: 1
-```
 
  - [ ] Задание со *
-   - Выясните причину, по которой pod frontend находится в статусе Error
- ```
-{"message":"Tracing enabled.","severity":"info","timestamp":"2022-03-29T21:31:48.429464968Z"}
-{"message":"Profiling enabled.","severity":"info","timestamp":"2022-03-29T21:31:48.429514385Z"}
-panic: environment variable "PRODUCT_CATALOG_SERVICE_ADDR" not set
+   С использованием параметров maxSurge и maxUnavailable
+   самостоятельно реализуйте два следующих сценария
+   развертывания: blue-green, Rolling Update.
+   paymentservice-deployment-bg.yaml
 ```
-   - Создайте новый манифест  . При его
-   применении ошибка должна исчезнуть. Подсказки можно найти:
-   В логах - kubectl logs frontend
-   В манифесте по
-   В результате, после применения исправленного манифеста pod
-   frontend должен находиться в статусе Running (опустим вопрос,
-   действительно ли микросервис работает)
-
-## В процессе сделано:
- - описан Dockerfile для запуска nginx пользователя с UID 1001, 
- и выполнено минимальное конфгурирование nginx (listen port 8000, host root /app)
- - образ залит в личный регистри dochombo/otus:web.v1
- - установлен kubectl
- - развёрнут кластер Minikube, проведена проверка устойчивости работы 
-кастара поднятого по умолчанию *(docker rm -f $(docker ps -a -q))*
- - изучены инструкции kubectl 
-
-``` 
-kubectl apply -f <file>
-kubectl get pod <name> -o yaml
-kubectl describe pod <name>
-kubectl delete pod <name>
-kubectl get pods -w
-kubectl port-forward --address 0.0.0.0 pod/<name> port:port
-...
-использования ad-hoc режима
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 3
 ```
- - найден ответ на вопрос о причинах восстановления pod в kube-system namespace
- - созданы манифесты *web-pod.yaml, frontend-pod-healthy.yaml*
+   paymentservice-deployment-reverse.yaml
+```  
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
+```
 
-## Как запустить проект:
- - ...
-
-## Как проверить работоспособность:
- - ...
+ - DaemonSet для Node Exporter на всех нодах
+```
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+```
 
 ## PR checklist:
- - [ kubernetes-intro ] Выставлен label с темой домашнего задания
+ - [ kubernetes-controllers ] Выставлен label с темой домашнего задания
