@@ -18,6 +18,8 @@ spec:
       - name: server
         image: dochombo/otus:paymentservice.v2
         imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 50051
         env:
         - name: PORT
           value: "50051"
@@ -27,4 +29,3 @@ spec:
           value: "1"
         - name: DISABLE_DEBUGGER
           value: "1"
-###maxSurge и maxUnavailable
