@@ -1,53 +1,28 @@
-# Выполнено ДЗ № 2
+# Выполнено ДЗ № 4
 
  - [ ] Основное ДЗ
- - Удалите все запущенные pod и после их пересоздания еще раз
-   проверьте, из какого образа они развернулись
-   Руководствуясь материалами лекции опишите произошедшую
-   ситуацию, почему обновление ReplicaSet не повлекло обновление
-   запущенных pod?
-```   
-chombo@% kubectl delete pods -l app=frontend
-pod "frontend-dpnkg" deleted
-pod "frontend-nhlgm" deleted
-pod "frontend-sk8rf" deleted
-chombo@% kubectl get pods -l app=frontend -o=jsonpath='{.items[0:3].spec.containers[0].image}'
-dochombo/otus:frontend.v2 dochombo/otus:frontend.v2 dochombo/otus:frontend.v2%
-```
-контроллер ReplicaSet следит за количеством запущенных подов,
-но не за их «качеством». Для применения необходимо создать 
-ReplicaSet с новой конфигураций, затем уменьшаем replicas в 
-старом и увеличивить replicas в новом.
 
+Цели занятия
+управлять Kubernetes кластером с использованием ролевой модели доступа;
+добавлять новых пользователей и ограничивать их права.
 
- - [ ] Задание со *
-   С использованием параметров maxSurge и maxUnavailable
-   самостоятельно реализуйте два следующих сценария
-   развертывания: blue-green, Rolling Update.
-   paymentservice-deployment-bg.yaml
 ```
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 3
-```
-   paymentservice-deployment-reverse.yaml
-```  
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 1
-      maxSurge: 0
-```
+└── kubernetes-security
+    ├── task01
+    │   ├── 01bob-serviceaccount.yaml
+    │   └── 02dave-serviceaccount.yaml
+    ├── task02
+    │   ├── 01prometheus-namespace.yaml
+    │   ├── 02carol-serviceaccount.yaml
+    │   └── 03rolebinding.yaml
+    └── task03
+        ├── 01dev-namespace.yaml
+        ├── 02jane-serviceaccount.yaml
+        ├── 03jane-bind.yaml
+        ├── 04ken-serviceaccount.yaml
+        └── 05ken-bind.yaml
 
- - DaemonSet для Node Exporter на всех нодах
-```
-      tolerations:
-      - key: node-role.kubernetes.io/master
-        operator: Exists
-        effect: NoSchedule
 ```
 
 ## PR checklist:
- - [ kubernetes-controllers ] Выставлен label с темой домашнего задания
+ - [ kubernetes-security ] Выставлен label с темой домашнего задания
