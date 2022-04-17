@@ -1,17 +1,13 @@
-# Выполнено ДЗ № 4
+# Выполнено ДЗ № 5
 
  - [ ] Основное ДЗ
-
-Цели занятия
-управлять Kubernetes кластером с использованием ролевой модели доступа;
-добавлять новых пользователей и ограничивать их права.
-
+   Volumes, Storages, StatefulSet, Secret
 ```
-
- kubectl apply -f ../kubernetes-intro/web-pod.yaml
- 
-
+└── kubernetes-volumes
+    ├── minio-headless-service.yaml
+    ├── minio-mysecret.yaml
+    └── minio-statefulset.yaml
 ```
 
 ## PR checklist:
- - [ kubernetes-security ] Выставлен label с темой домашнего задания
+ - [ kubernetes-volumes ] Выставлен label с темой домашнего задания
