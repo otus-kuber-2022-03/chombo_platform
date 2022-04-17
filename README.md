@@ -7,20 +7,9 @@
 добавлять новых пользователей и ограничивать их права.
 
 ```
-└── kubernetes-security
-    ├── task01
-    │   ├── 01bob-serviceaccount.yaml
-    │   └── 02dave-serviceaccount.yaml
-    ├── task02
-    │   ├── 01prometheus-namespace.yaml
-    │   ├── 02carol-serviceaccount.yaml
-    │   └── 03rolebinding.yaml
-    └── task03
-        ├── 01dev-namespace.yaml
-        ├── 02jane-serviceaccount.yaml
-        ├── 03jane-bind.yaml
-        ├── 04ken-serviceaccount.yaml
-        └── 05ken-bind.yaml
+
+ kubectl apply -f ../kubernetes-intro/web-pod.yaml
+ 
 
 ```
 
