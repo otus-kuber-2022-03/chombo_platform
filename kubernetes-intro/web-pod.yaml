@@ -6,26 +6,26 @@ metadata:
     app: web
 spec:
   containers:
-    - name: web
-      image: dochombo/otus:web.v1
-      imagePullPolicy: Always
-      readinessProbe:
-        httpGet:
-          path: /index.html
-          port: 8000
-      livenessProbe:
-        tcpSocket: { port: 8000 }
-      volumeMounts:
-        - name: app
-          mountPath: /app
+  - name: web
+    image: dochombo/otus:web.v1
+    imagePullPolicy: Always
+    readinessProbe:
+      httpGet:
+        path: /index.html
+        port: 8000
+    livenessProbe:
+      tcpSocket: { port: 8000 }
+    volumeMounts:
+    - name: app
+      mountPath: /app
   initContainers:
-    - name: init-web
-      image: busybox:1.34.1
-      imagePullPolicy: IfNotPresent
-      volumeMounts:
-        - name: app
-          mountPath: /app
-      command: ['sh', '-c', 'wget -O- https://tinyurl.com/otus-k8s-intro | sh']
+  - name: init-web
+    image: busybox:1.34.1
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - name: app
+      mountPath: /app
+    command: ['sh', '-c', 'wget -O- https://tinyurl.com/otus-k8s-intro | sh']
   volumes:
     - name: app
       emptyDir: {}
