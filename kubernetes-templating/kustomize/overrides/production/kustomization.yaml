@@ -1,0 +1,14 @@
+bases:
+- ../../base
+commonLabels:
+  app: production-adservice
+  env: production
+namespace: hipster-shop-prod
+namePrefix: production-
+patchesStrategicMerge:
+- replicas.yaml
+- memory.yaml
+images:
+  - name: adservice
+    newName: gcr.io/google-samples/microservices-demo/adservice
+    newTag: v0.1.3

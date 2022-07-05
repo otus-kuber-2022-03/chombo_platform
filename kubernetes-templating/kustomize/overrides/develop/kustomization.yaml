@@ -1,0 +1,11 @@
+bases:
+  - ../../base
+commonLabels:
+  app: develop-adservice
+  env: develop
+namespace: hipster-shop
+namePrefix: develop-
+images:
+  - name: adservice
+    newName: gcr.io/google-samples/microservices-demo/adservice
+    newTag: v0.1.3
