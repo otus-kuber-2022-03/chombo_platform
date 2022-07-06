@@ -1,0 +1,7 @@
+resources:
+  - deployment.yaml
+  - service.yaml
+images:
+  - name: adservice
+    newName: gcr.io/google-samples/microservices-demo/adservice
+    newTag: v0.1.3

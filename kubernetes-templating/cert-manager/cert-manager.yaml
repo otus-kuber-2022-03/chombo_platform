@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: "2022-06-28T16:02:01Z"
+  name: cert-manager
+  resourceVersion: "2454320"
+  selfLink: /api/v1/namespaces/cert-manager
+  uid: 1db6a57a-60fa-4489-a645-7273df3a054b
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: "2022-06-28T17:58:52Z"
+  name: chartmuseum
+  resourceVersion: "2496690"
+  selfLink: /api/v1/namespaces/chartmuseum
+  uid: 46f809ad-6b75-4c1f-a8ea-75688a3b56ed
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active

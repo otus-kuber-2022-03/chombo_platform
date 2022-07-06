@@ -1,157 +1,217 @@
-# Выполнено ДЗ № 7
+# Выполнено ДЗ № 6
 
-- [ ] Основное ДЗ
+- [ ] Основное ДЗ **cert-manager**
 
-Примеры локальных экспеременентов  kubernetes-operators/m1_deploy
+
+*To automatically install and manage the CRDs as part of your
+Helm release, you must add the --set installCRDs=true flag to your Helm installation command.*
+
+В соответвии с документацией можно использовать *--set installCRDs=true* вместо
+*kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.2/cert-manager.crds.yaml*
+
+
+```shell
+mkdir -p kubernetes-templating/cert-manager 
+cd kubernetes-templating/cert-manager 
+kubectl create namespace=cert-manager
+kubectl get namespace cert-manager -o yaml >> cert-manager.yaml
+helm install my-release --namespace cert-manager \
+  --version v1.8.2 jetstack/cert-manager --set installCRDs=true
 ```
-├── kubernetes-operators
-│   ├── build
-│   │   ├── Dockerfile
-│   │   ├── mysql-operator.py
-│   │   └── templates
-│   │       ├── backup-job.yml.j2
-│   │       ├── backup-pv.yml.j2
-│   │       ├── backup-pvc.yml.j2
-│   │       ├── mysql-deployment.yml.j2
-│   │       ├── mysql-pv.yml.j2
-│   │       ├── mysql-pvc.yml.j2
-│   │       ├── mysql-service.yml.j2
-│   │       └── restore-job.yml.j2
-│   ├── deploy
-│   │   ├── ClusterRoleBinding.yml
-│   │   ├── cr.yml
-│   │   ├── crd.yml
-│   │   ├── deploy-operator.yml
-│   │   ├── role.yml
-│   │   └── service-account.yml
-│   └── m1_deploy
-│       ├── cr.yml
-│       └── crd.yml
-
-```
-С момента описание схемы выполнения ДЗ произошли изменения:
-m1_deploy/crd.yml
-```
-#The apiextensions.k8s.io/v1beta1 API version of CustomResourceDefinition is no longer served as of v1.22.
-#https://kubernetes.io/docs/reference/using-api/deprecation-guide/#customresourcedefinition-v122
-apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
-
+```shell
+kubectl apply -f issuer.yaml 
 ```
 
-Отладка контроллер - при использовании для примера приложенного к домашнему заданию контроллера
-были исправлены следующее
-
-```
-#load() missing 1 required positional argument: 'Loader'", 'subrefs
-- json_manifest = yaml.load(yaml_manifest)
-+ json_manifest = yaml.safe_load(sys.stdin)
-```
-
-```
-#'это не обязательно, по факту в шаблоне указано явно, как задел а будущее
-- backup_pv = render_template('backup-pv.yml.j2', {'name': name})
-+ backup_pv = render_template('backup-pv.yml.j2', {'name': name, 'storage_size': storage_size})
-
-- backup_pvc = render_template('backup-pvc.yml.j2', {'name': name)
-+ backup_pvc = render_template('backup-pvc.yml.j2', {'name': name, 'storage_size': storage_size})
+```shell
+kubectl get pods --namespace cert-manager
+NAME                                                 READY   STATUS    RESTARTS   AGE
+my-release-cert-manager-7d77899bb5-fq2pt             1/1     Running   0          32m
+my-release-cert-manager-cainjector-6bbdcbb58-9kfc6   1/1     Running   0          32m
+my-release-cert-manager-webhook-7f667bdb9c-t84tn     1/1     Running   0          32m
 ```
 
-Так как домашнее задание выполняется на m1, возникли сложности и образом
-mysql:5.7, в процессе локальной отладки использовался arm64v8/mysql:8.0.29-oracle.
-
-build/templates/mysql-deployment.yml.j2
-```
-- args:
-- - "--ignore-db-dir=lost+found"
-```
-Вероятнее всего при автотестах не заработает, ограниченное свободное время
-на выполнение ДЗ - не позволит сделать его в полном обьеме, так что частично
-придется ограничиться тестовыми пояснениями
-
-Еще одной неприятной и не решенной проблемой - оказалась необходимость руками
-удалять mysql-instance-pv.
-```
-[2022-05-18 19:51:42,187] kopf.objects         [WARNING ] [default/mysql-instance] Patching failed with inconsistencies: (('remove', ('status',), {'kopf': {'progress': 
-{'mysql_on_create': {'started': '2022-05-18T16:51:42.120697', 'stopped': None, 'delayed': '2022-05-18T16:52:42.175612', 'purpose': 'create', 'retries': 1, 'success': 
-False, 'failure': False, 'message': '(409)\nReason: Conflict\nHTTP response headers: HTTPHeaderDict({\'Audit-Id\': \'70b1402d-5889-4c81-8ae8-d4e078b58a5c\', \'Cache-Control\': \'no-cache, private\', \'Content-Type\': 
-\'application/json\', \'X-Kubernetes-Pf-Flowschema-Uid\': \'b41bfecc-8ad1-4996-ab2d-bc0acd241368\', \'X-Kubernetes-Pf-Prioritylevel-Uid\': \'dfab7d6d-35c9-4382-bf9b-a48d4bc1daee\', \'Date\': 
-\'Wed, 18 May 2022 16:51:42 GMT\', \'Content-Length\': \'238\'})\nHTTP response body: {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"persistentvolumes \\"mysql-instance-pv\\" already exists",
-"reason":"AlreadyExists","details":{"name":"mysql-instance-pv","kind":"persistentvolumes"},"code":409}\n\n', 'subrefs': None}}}}, None),)
-
+```shell
+kubectl apply -f test-resources.yaml 
+kubectl describe certificate -n cert-manager-test
 ```
 
-- [ ] Задание со * (1)
-
-- Исправить контроллер, чтобы он писал в status subresource
-- Описать изменения в README.md (показать код, объяснить, что он делает)
-- В README показать, что в status происходит запись
-- Например, при успешном создании mysql-instance, kubectl describe
-  mysqls.otus.homework mysql-instance может показывать:
-
-m1_deploy/crd.yml
-``` 
-            status:
-              type: object
-              properties:
-                describe:
-                  type: string
-      subresources:
-        status: {}
-```
-~/Library/Python/3.8/bin/kopf run mysql-operator.py
-```
-@kopf.on.create('otus.homework', 'v1', 'mysqls')
-def set_status_describe(spec, patch, **kwargs):
-    patch.status['describe'] = 'describe it'
- ```
-
-kubectl describe mysqls.otus.homework mysql-instance
-
-```
+```text
+...
 Spec:
-  Database:      otus-database
-  Image:         arm64v8/mysql:8.0.29-oracle
-  Password:      otuspassword
-  storage_size:  1Gi
+  Dns Names:
+    example.com
+  Issuer Ref:
+    Name:       test-selfsigned
+  Secret Name:  selfsigned-cert-tls
 Status:
-  Describe:  describe it
+  Conditions:
+    Last Transition Time:  2022-06-28T16:41:29Z
+    Message:               Certificate is up to date and has not expired
+...
 Events:
-  Type    Reason   Age   From  Message
-  ----    ------   ----  ----  -------
-  Normal  Logging  23s   kopf  Handler 'set_status_describe' succeeded.
-  Normal  Logging  23s   kopf  Creation is processed: 2 succeeded; 0 failed.
-  Normal  Logging  23s   kopf  Handler 'mysql_on_create' succeeded.
+  Type    Reason     Age   From                                       Message
+  ----    ------     ----  ----                                       -------
+  Normal  Issuing    18s   cert-manager-certificates-trigger          Issuing certificate as Secret does not exist
+  Normal  Generated  18s   cert-manager-certificates-key-manager      Stored new private key in temporary Secret resource "selfsigned-cert-5tdmw"
+  Normal  Requested  18s   cert-manager-certificates-request-manager  Created new CertificateRequest resource "selfsigned-cert-7wk7d"
+  Normal  Issuing    18s   cert-manager-certificates-issuing          The certificate has been successfully issued
+
 ```
 
-- [ ] Задание со * (2)
-  В задании предложено реализовать изменений пароля (в случае с предложенным в задании вариантом
-  дополнительно надо было бы создать шаблон job и выполнить похожие
-  действия как описаны в mysql_on_create)
-  Реализация была сознательно упрощена, в случае изменения
-  spec.field записывается status.describe:
+```shell
+kubectl delete -f test-resources.yaml
+```
 
-m1_deploy/cr.yml
+- [ ] Основное ДЗ **chartmuseum**
+
+
+```shell
+mkdir -p kubernetes-templating/chartmuseum
+cd kubernetes-templating/chartmuseum
+curl  https://raw.githubusercontent.com/helm/charts/390ee6614b4bb0da96b397f9b382e3ddca9f59a4/stable/chartmuseum/values.yaml >> values.tmp.yaml
+touch values.yaml
+#update values.yaml
+kubectl create ns chartmuseum
+kubectl get namespace chartmuseum -o yaml >> chartmuseum.yaml
+helm repo add chartmuseum https://chartmuseum.github.io/charts
+helm install my-chartmuseum chartmuseum/chartmuseum \
+    --namespace=chartmuseum \
+    --version 3.8.0 \
+    -f values.yaml
 ```
-  field: field2
+```shell
+kubectl get secrets -n chartmuseum
+NAME                                               TYPE                                  DATA   AGE
+chartmuseum.84.252.143.215.nip.io                  kubernetes.io/tls                     2      10m
 ```
-m1_deploy/crd.yml
+![Let's Encrypt](kubernetes-templating/chartmuseum/asdj876tx.png)
+
+- [ ] Задание со * **chartmuseum**
+
+Необходимо добавить *--set env.open.DISABLE_API=false* или
+```text
+env:
+  open:
+    DISABLE_API: false
 ```
-                field:
-                  type: string
+```shell
+helm create firstchart 
+cd firstchart 
+#update
+helm package .
+curl -L --data-binary @firstchart-0.1.0.tgz  https://chartmuseum.84.252.143.215.nip.io/api/charts 
+#{"saved":true}
+#add to helm
+helm repo add chartmuseum_local https://chartmuseum.84.252.143.215.nip.io/
+helm install chartmuseum_local/firstchart --generate-name
 ```
-kubectl describe mysqls.otus.homework mysql-instance
+
+- [ ] Основное ДЗ **harbor**
+
+```shell
+mkdir -p kubernetes-templating/harbor
+cd kubernetes-templating/harbor
+kubectl create ns harbor
+helm repo add harbor https://helm.goharbor.io #vpn only
+helm install my-harbor harbor/harbor \
+    --namespace=harbor \
+    -f values.yaml
+#helm uninstall my-harbor
+kubectl get secrets -n harbor -l owner=helm
+NAME                              TYPE                 DATA   AGE
+sh.helm.release.v1.my-harbor.v1   helm.sh/release.v1   1      2m36s
+
 ```
-Status:
-  Describe:  old:field1; new:field2
-Events:
-  Type    Reason   Age   From  Message
-  ----    ------   ----  ----  -------
-  Normal  Logging  16s   kopf  Updating is processed: 1 succeeded; 0 failed.
-  Normal  Logging  16s   kopf  Handler 'update_field/spec.field' succeeded.
+![harbor](kubernetes-templating/harbor/asfTRw8.png)
+
+
+- [ ] Основное ДЗ **hipster-shop**
+```text
+.
+├── frontend
+│   ├── Chart.yaml
+│   ├── charts
+│   ├── templates
+│   │   ├── deployment.yaml
+│   │   ├── ingress.yaml
+│   │   └── service.yaml
+│   └── values.yaml
+└── hipster-shop
+    ├── Chart.lock
+    ├── Chart.yaml
+    ├── charts
+    │   ├── frontend-0.1.0.tgz
+    │   └── redis-16.13.1.tgz
+    └── templates
+        └── all-hipster-shop.yaml
+
+
+```
+```text
+dependencies:
+- name: frontend
+  version: 0.1.0
+  repository: "file://../frontend"
+```
+
+- [ ] Задание со * **REDIS**
+
+```text
+dependencies:
+- name: redis
+  version: 16.13.1
+  repository: https://charts.bitnami.com/bitnami
+```
+```shell
+#Push chart example
+helm plugin install https://github.com/chartmuseum/helm-push
+helm cm-push -u **** -p **** charts/frontend-0.1.0.tgz selflibrary
+#helm install my-selflibrary-front selflibrary/frontend \
+#     --version 0.1.0 --namespace=***
+```
+- [ ] Задание со * **helm-secrets**
+
+  kubernetes-templating/frontend/secrets.yaml.dist
+
+- [ ] Основное ДЗ **kubecfg**
+
+```shell
+kubecfg
+├── paymentservice-deployment.yaml
+├── paymentservice-service.yaml
+├── shippingservice-deployment.yaml
+└── shippingservice-service.yaml
+```
+
+```shell
+kubecfg version
+kubecfg version: v0.26.0
+jsonnet version: v0.18.0
+client-go version: v0.0.0-master+$Format:%H$
+```
+
+- [ ] Задание со * **qbec**  or **Kapitan**
+
+не обязательное, не выполнялось
+
+- [] Самостоятельное Kustomize
+```shell
+kustomize % tree
+.
+├── base        
+│   ├── deployment.yaml
+│   ├── kustomization.yaml
+│   └── service.yaml
+└── overrides
+    ├── develop
+    │   └── kustomization.yaml
+    └── production
+        ├── kustomization.yaml
+        ├── memory.yaml
+        └── replicas.yaml
+
 ```
 
 ## PR checklist:
-- [ kubernetes-operators ] Выставлен label с темой домашнего задания
-
+- [ kubernetes-templating  ] Выставлен label с темой домашнего задания
 
